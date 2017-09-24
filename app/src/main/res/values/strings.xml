@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">LocationDemoApp</string>
+    <string name="lat_long_text"><![CDATA[LATITUDE :<b> %1$f </b><br />LONGITUDE :<b> %2$f </b>]]></string>
+</resources>
