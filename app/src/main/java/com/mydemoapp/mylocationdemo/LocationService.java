@@ -14,8 +14,8 @@ public class LocationService extends Service {
     private static final String TAG = LocationService.class.getSimpleName();
     private LocationManager locationManager;
     private MyLocationListener myLocationListener;
-    private static final long LOCATION_REFRESH_DISTANCE = 1; // 1 meters
-    private static final long LOCATION_REFRESH_TIME = 1000; // 1 second
+    private static final long LOCATION_REFRESH_DISTANCE = 5; // 5 meters
+    private static final long LOCATION_REFRESH_TIME = 5000; // 5 second
 
     @Override
     public void onCreate() {

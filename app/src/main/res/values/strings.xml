@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">LocationDemoApp</string>
     <string name="lat_long_text"><![CDATA[LATITUDE :<b> %1$f </b><br />LONGITUDE :<b> %2$f </b>]]></string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+
+    <string name="enable_service_dialog_title">Enable %1s</string>
+    <string name="enable_service_dialog_msg"><![CDATA[You Need to enable <b>%1s</b> for app to work]]></string>
+    <string name="gps">GPS</string>
+    <string name="network">Network</string>
+    <string name="fetching_location">Fetching Location.....</string>
 </resources>

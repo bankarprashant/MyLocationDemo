@@ -1,13 +1,17 @@
 package com.mydemoapp.mylocationdemo;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.widget.TextView;
@@ -15,7 +19,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private LocationBroadcastReceiver locationBroadcastReceiver;
     @BindView(R.id.locationTextView)
@@ -34,9 +38,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart: ");
-        startService(new Intent(this, LocationService.class));
-        LocalBroadcastManager.getInstance(this).registerReceiver(locationBroadcastReceiver,
-                new IntentFilter(AppConstants.LOCATION_UPDATE_CALLBACK));
+        if (isLocationPermissionGranted()) {
+            getLocation();
+        }
+    }
+
+    private void getLocation() {
+        if (!isGpsEnabled() && !isNetworkEnabled()) {
+            showEnableServicePrompt(getString(R.string.gps));
+        } else {
+            startService(new Intent(this, LocationService.class));
+            LocalBroadcastManager.getInstance(this).registerReceiver(locationBroadcastReceiver,
+                    new IntentFilter(AppConstants.LOCATION_UPDATE_CALLBACK));
+        }
     }
 
     @Override
@@ -48,11 +62,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class LocationBroadcastReceiver extends BroadcastReceiver {
+        @SuppressWarnings("deprecation")
         @Override
         public void onReceive(Context context, Intent intent) {
             Location location = intent.getParcelableExtra(AppConstants.LOCATION);
             Log.d(TAG, "onReceive: " + " LAT :" + location.getLatitude() + " LONG : " + location.getLongitude());
-            locationTextView.setText(Html.fromHtml(getString(R.string.lat_long_text, location.getLatitude(), location.getLongitude())));
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N)
+                locationTextView.setText(Html.fromHtml(getString(R.string.lat_long_text, location.getLatitude(), location.getLongitude()), Html.FROM_HTML_MODE_LEGACY));
+            else
+                locationTextView.setText(Html.fromHtml(getString(R.string.lat_long_text, location.getLatitude(), location.getLongitude())));
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case LOCATION_REQUEST_CODE:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        getLocation();
+                    }
+                } else finish();
         }
     }
 }
